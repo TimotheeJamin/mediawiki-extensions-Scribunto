@@ -287,12 +287,17 @@ class Scribunto_LuaTitleLibrary extends Scribunto_LuaLibraryBase {
 			return null;
 		}
 
+		// [Use approved revision if it exists -- TJ]
+		if ( !class_exists( 'ApprovedRevs' ) || !is_numeric( $revid = ApprovedRevs::getApprovedRevID( $title ) ) ) {
+			$revid = $title->getLatestRevID();
+		} 
 		// Record in templatelinks, so edits cause the page to be refreshed
 		$this->getParser()->getOutput()->addTemplate(
-			$title, $title->getArticleID(), $title->getLatestRevID()
+			$title, $title->getArticleID(), $revid
 		);
 
-		$rev = $this->getParser()->fetchCurrentRevisionRecordOfTitle( $title );
+		// $rev = $this->getParser()->fetchCurrentRevisionRecordOfTitle( $title );
+		$rev = MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle( $title, $revid );
 
 		if ( $title->equals( $this->getTitle() ) ) {
 			$parserOutput = $this->getParser()->getOutput();

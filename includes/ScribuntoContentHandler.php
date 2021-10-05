@@ -164,7 +164,12 @@ class ScribuntoContentHandler extends CodeContentHandler {
 
 			// Mark the doc page as a transclusion, so we get purged when it
 			// changes.
-			$parserOutput->addTemplate( $doc, $doc->getArticleID(), $doc->getLatestRevID() );
+			// [Use approved revision if it exists -- TJ]
+			if ( !class_exists( 'ApprovedRevs' ) || !is_numeric( $revid = ApprovedRevs::getApprovedRevID( $doc ) ) ) {
+				$revid = $doc->getLatestRevID();
+			}
+
+			$parserOutput->addTemplate( $doc, $doc->getArticleID(), $revid );
 		}
 
 		// Validate the script, and include an error message and tracking
