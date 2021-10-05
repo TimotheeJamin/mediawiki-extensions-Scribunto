@@ -99,7 +99,12 @@ class ScribuntoContent extends TextContent {
 
 			// Mark the doc page as a transclusion, so we get purged when it
 			// changes.
-			$output->addTemplate( $doc, $doc->getArticleID(), $doc->getLatestRevID() );
+			// [Use approved revision if it exists -- TJ]
+			if ( !class_exists( 'ApprovedRevs' ) || !is_numeric( $revid = ApprovedRevs::getApprovedRevID( $title ) ) ) {
+				$revid = $title->getLatestRevID();
+			} 
+
+			$output->addTemplate( $doc, $doc->getArticleID(), $revid );
 		}
 
 		// Validate the script, and include an error message and tracking
